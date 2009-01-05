@@ -2,6 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
+	<TextView android:id="@+id/posisionView" android:layout_width="wrap_content" 
+	android:layout_height="wrap_content"></TextView>
 	<com.google.android.maps.MapView 
 		android:id="@+id/map"
 		android:layout_width="fill_parent"
@@ -9,5 +11,6 @@
 		android:text="@string/hello"
 		android:enabled="true"
 		android:clickable="true"
-		android:apiKey="0DclZOOK3MUwPWHzrcpVl_JesnkRADaTdYFbHMQ" />
+		android:apiKey="0DclZOOK3MUwXqN3j3iwClJJEEC_n0Z8t7n-SVw" />
+
 </LinearLayout>
