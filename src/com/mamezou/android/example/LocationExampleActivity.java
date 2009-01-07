@@ -1,15 +1,27 @@
 package com.mamezou.android.example;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
@@ -28,15 +40,15 @@ public class LocationExampleActivity extends MapActivity {
 	private static final int ZOOM_DOWN_ID = 3;
 	private static final int MOVE_TO_CURRENT_LOCATION_ID = 4;
 	private static final int SHOW_CURRENT_LOCATION_ID = 5;
-	
+	private static final int ADDRESS_TO_GEOCODE_ID = 6;
 
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        mapView = (MapView) findViewById(R.id.map);
-        textView = (TextView) findViewById(R.id.posisionView);
+        mapView = (MapView) findViewById(R.id.Map);
+        textView = (TextView) findViewById(R.id.PosisionView);
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         List<String> allProviders = locationManager.getAllProviders();
@@ -100,6 +112,7 @@ public class LocationExampleActivity extends MapActivity {
 		menu.add(VIEW_GROUP_ID, ZOOM_DOWN_ID, 1, R.string.zoom_down);
 		menu.add(VIEW_GROUP_ID, MOVE_TO_CURRENT_LOCATION_ID, 2, R.string.move_to_current_location);
 		menu.add(VIEW_GROUP_ID, SHOW_CURRENT_LOCATION_ID, 3, R.string.show_current_location);
+		menu.add(VIEW_GROUP_ID, ADDRESS_TO_GEOCODE_ID, 3, R.string.address_to_geocode);
     	return super.onCreateOptionsMenu(menu);
     }
  
@@ -119,6 +132,9 @@ public class LocationExampleActivity extends MapActivity {
 			break;
 		case MOVE_TO_CURRENT_LOCATION_ID:
 			moveToCurrentLocation();
+			break;
+		case ADDRESS_TO_GEOCODE_ID:
+			addressToGeocode();
 			break;
 		}
     	return true;
@@ -161,6 +177,47 @@ public class LocationExampleActivity extends MapActivity {
 
     }
 
+    private void addressToGeocode() {
+    	LayoutInflater factory = LayoutInflater.from(this);
+    	View view = factory.inflate(R.layout.geocode, null);
+    	final Button addressToGeocodeButton = (Button) view.findViewById(R.id.AddressToGeocodeButton);
+    	final EditText addressEditText = (EditText) view.findViewById(R.id.AddressEditText);
+    	final EditText geocodeEditText = (EditText) view.findViewById(R.id.GeocodeEditText);
+    	addressToGeocodeButton.setOnClickListener(new View.OnClickListener() {
+    		// TODO リスナーはきちんと整理
+    		// TODO 日本語はどうするか？
+    		public void onClick(View v) {
+    			CharSequence text = addressEditText.getText();
+    			Geocoder coder = new Geocoder(getApplicationContext());
+//    			Geocoder coder = new Geocoder(getApplicationContext(), Locale.JAPAN);
+    			List<Address> addresses = null;
+    			try {
+					addresses = coder.getFromLocationName(text.toString(), 1);
+				} catch (IOException e) {
+					// TODO ちゃんと例外処理
+					e.printStackTrace();
+				}
+				if (addresses.size() > 0) {
+					// TODO LatitudeとLongigudeを出す場所を分ける
+					geocodeEditText.setText("lat = " + addresses.get(0).getLatitude() + " lon = " + addresses.get(0).getLongitude());
+				}
+    		}
+    	});
+    	AlertDialog dialog = new AlertDialog.Builder(this).setView(view).setPositiveButton(
+				R.string.go_to_there, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO 行きたい場所に移動する
+						CharSequence text = geocodeEditText.getText();
+						Log.d("LocationExampleActivity", "text = " + text);
+					}
+				}).setNegativeButton(R.string.cancel,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+					}
+				}).create();
+    	dialog.show();
+    	
+	}
     // TODO GeoCoderの利用
     @Override
     protected void onPause() {

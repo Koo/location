@@ -6,4 +6,10 @@
     <string name="zoom_down">Zoom out</string>
     <string name="move_to_current_location">Move to current location</string>
     <string name="show_current_location">Show current location</string>
+    <string name="geocode_to_address">Geocode to address</string>
+    <string name="address_to_geocode">Address to geocode</string>
+    <string name="address">Address</string>
+    <string name="geocode">Geocode</string>
+    <string name="go_to_there">Go to there</string>
+    <string name="cancel">Cancel</string>
 </resources>
