@@ -11,6 +11,6 @@
 		android:text="@string/hello"
 		android:enabled="true"
 		android:clickable="true"
-		android:apiKey="0DclZOOK3MUwXqN3j3iwClJJEEC_n0Z8t7n-SVw" />
+		android:apiKey="0DclZOOK3MUwPWHzrcpVl_JesnkRADaTdYFbHMQ" />
 
 </LinearLayout>

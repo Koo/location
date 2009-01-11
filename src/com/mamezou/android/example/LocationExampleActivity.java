@@ -2,10 +2,8 @@ package com.mamezou.android.example;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.location.Address;
@@ -14,7 +12,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +31,9 @@ public class LocationExampleActivity extends MapActivity {
 	private TextView textView;
 	private LocationManager locationManager;
 	private MyLocationOverlay myLocationOverlay;
+
+	private Double longitude;
+	private Double latitude;
 
 	private static final int VIEW_GROUP_ID = 1;
 	private static final int ZOOM_UP_ID = 2;
@@ -182,33 +182,46 @@ public class LocationExampleActivity extends MapActivity {
     	View view = factory.inflate(R.layout.geocode, null);
     	final Button addressToGeocodeButton = (Button) view.findViewById(R.id.AddressToGeocodeButton);
     	final EditText addressEditText = (EditText) view.findViewById(R.id.AddressEditText);
-    	final EditText geocodeEditText = (EditText) view.findViewById(R.id.GeocodeEditText);
+    	final EditText longitudeEditText = (EditText) view.findViewById(R.id.LongitudeEditText);
+    	final EditText latitudeEditText = (EditText) view.findViewById(R.id.LatitudeEditText);
+
+    	// 選択せず
+    	longitude = null;
+    	latitude = null;
+
     	addressToGeocodeButton.setOnClickListener(new View.OnClickListener() {
-    		// TODO リスナーはきちんと整理
-    		// TODO 日本語はどうするか？
     		public void onClick(View v) {
     			CharSequence text = addressEditText.getText();
     			Geocoder coder = new Geocoder(getApplicationContext());
+        		// TODO 日本語はどうするか？
 //    			Geocoder coder = new Geocoder(getApplicationContext(), Locale.JAPAN);
     			List<Address> addresses = null;
     			try {
 					addresses = coder.getFromLocationName(text.toString(), 1);
 				} catch (IOException e) {
-					// TODO ちゃんと例外処理
+					Log.e("LocationExampleActivity", "Geocoder call failed", e);
 					e.printStackTrace();
 				}
 				if (addresses.size() > 0) {
-					// TODO LatitudeとLongigudeを出す場所を分ける
-					geocodeEditText.setText("lat = " + addresses.get(0).getLatitude() + " lon = " + addresses.get(0).getLongitude());
+					Address address = addresses.get(0);
+					longitude = new Double(address.getLongitude());
+					latitude = new Double(address.getLatitude());
+					longitudeEditText.setText(String.valueOf(longitude));
+					latitudeEditText.setText(String.valueOf(latitude));
 				}
     		}
     	});
     	AlertDialog dialog = new AlertDialog.Builder(this).setView(view).setPositiveButton(
 				R.string.go_to_there, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
-						// TODO 行きたい場所に移動する
-						CharSequence text = geocodeEditText.getText();
-						Log.d("LocationExampleActivity", "text = " + text);
+						Log.d("LocationExampleActivity", "latitude = " + latitude);
+						Log.d("LocationExampleActivity", "longitude = " + longitude);
+						if (latitude != null && longitude != null) {
+							int latitudeE6 = (int)(latitude * 1E6);
+							int longitudeE6 = (int)(longitude * 1E6);
+							
+							mapView.getController().animateTo(new GeoPoint(latitudeE6, longitudeE6));
+						}
 					}
 				}).setNegativeButton(R.string.cancel,
 				new DialogInterface.OnClickListener() {
@@ -218,7 +231,7 @@ public class LocationExampleActivity extends MapActivity {
     	dialog.show();
     	
 	}
-    // TODO GeoCoderの利用
+
     @Override
     protected void onPause() {
     	// MyLocationOverlayを無効化

@@ -12,4 +12,6 @@
     <string name="geocode">Geocode</string>
     <string name="go_to_there">Go to there</string>
     <string name="cancel">Cancel</string>
+<string name="longitude">Longitude</string>
+<string name="latitude">Latitude</string>
 </resources>
