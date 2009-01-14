@@ -1,6 +1,7 @@
 package com.mamezou.android.example;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
@@ -17,8 +18,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.maps.GeoPoint;
@@ -27,22 +31,25 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 
 public class LocationExampleActivity extends MapActivity {
-	private MapView mapView;
-	private TextView textView;
-	private LocationManager locationManager;
-	private MyLocationOverlay myLocationOverlay;
+    private MapView mapView;
+    private TextView textView;
+    private LocationManager locationManager;
+    private MyLocationOverlay myLocationOverlay;
 
-	private Double longitude;
-	private Double latitude;
+    private Double longitude;
+    private Double latitude;
 
-	private static final int VIEW_GROUP_ID = 1;
-	private static final int ZOOM_UP_ID = 2;
-	private static final int ZOOM_DOWN_ID = 3;
-	private static final int MOVE_TO_CURRENT_LOCATION_ID = 4;
-	private static final int SHOW_CURRENT_LOCATION_ID = 5;
-	private static final int ADDRESS_TO_GEOCODE_ID = 6;
+    private static final int VIEW_GROUP_ID = 1;
+    private static final int ZOOM_UP_ID = 2;
+    private static final int ZOOM_DOWN_ID = 3;
+    private static final int MOVE_TO_CURRENT_LOCATION_ID = 4;
+    private static final int SHOW_CURRENT_LOCATION_ID = 5;
+    private static final int ADDRESS_TO_GEOCODE_ID = 6;
 
-	/** Called when the activity is first created. */
+    /** GEOCODEの最大結果件数 */
+    protected static final int MAX_GEOCODE_RESULT = 10;
+
+    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,52 +60,52 @@ public class LocationExampleActivity extends MapActivity {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         List<String> allProviders = locationManager.getAllProviders();
         for (int i = 0; i < allProviders.size(); i++) {
-        	Log.d("LocationExampleActivity", "provider [" + i + "] is " + allProviders.get(i));
+            Log.d("LocationExampleActivity", "provider [" + i + "] is "
+                    + allProviders.get(i));
         }
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+                0, new LocationListener() {
 
-			public void onLocationChanged(Location location) {
-	        	Log.d("LocationExampleActivity", 
-	        			"location changed to " 
-	        			+ location.getLongitude() 
-	        			+ " "
-	        			+ location.getLatitude());
-			}
+                    public void onLocationChanged(Location location) {
+                        Log.d("LocationExampleActivity", "location changed to "
+                                + location.getLongitude() + " "
+                                + location.getLatitude());
+                    }
 
-			public void onProviderDisabled(String provider) {
-	        	Log.d("LocationExampleActivity", 
-	        			"provider changed to " 
-	        			+ provider);
-			}
+                    public void onProviderDisabled(String provider) {
+                        Log.d("LocationExampleActivity", "provider changed to "
+                                + provider);
+                    }
 
-			public void onProviderEnabled(String provider) {
-	        	Log.d("LocationExampleActivity", 
-	        			"provider " + provider + " enabled");
-			}
+                    public void onProviderEnabled(String provider) {
+                        Log.d("LocationExampleActivity", "provider " + provider
+                                + " enabled");
+                    }
 
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-	        	Log.d("LocationExampleActivity", 
-	        			"provider " 
-	        			+ provider
-	        			+ "'s status is changed to "
-	        			+ status);
-				
-			}
-        	
-        });
+                    public void onStatusChanged(String provider, int status,
+                            Bundle extras) {
+                        Log.d("LocationExampleActivity", "provider " + provider
+                                + "'s status is changed to " + status);
 
-        myLocationOverlay = new MyLocationOverlay(getApplicationContext(), mapView);
-        
+                    }
+
+                });
+
+        myLocationOverlay = new MyLocationOverlay(getApplicationContext(),
+                mapView);
+
         myLocationOverlay.enableMyLocation();
         myLocationOverlay.onProviderEnabled(LocationManager.GPS_PROVIDER);
-    	myLocationOverlay.enableCompass();
-    	// 一番初めに現在位置が配信された際に実行されるコールバック
-        myLocationOverlay.runOnFirstFix(new Runnable() { public void run() {
-        	// 中心位置を現在位置に移動する
-            mapView.getController().animateTo(myLocationOverlay.getMyLocation());
-        }});
+        myLocationOverlay.enableCompass();
+        // 一番初めに現在位置が配信された際に実行されるコールバック
+        myLocationOverlay.runOnFirstFix(new Runnable() {
+            public void run() {
+                // 中心位置を現在位置に移動する
+                mapView.getController().animateTo(
+                        myLocationOverlay.getMyLocation());
+            }
+        });
 
         mapView.getOverlays().add(myLocationOverlay);
         mapView.setClickable(true);
@@ -108,144 +115,196 @@ public class LocationExampleActivity extends MapActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(VIEW_GROUP_ID, ZOOM_UP_ID, 0, R.string.zoom_up);
-		menu.add(VIEW_GROUP_ID, ZOOM_DOWN_ID, 1, R.string.zoom_down);
-		menu.add(VIEW_GROUP_ID, MOVE_TO_CURRENT_LOCATION_ID, 2, R.string.move_to_current_location);
-		menu.add(VIEW_GROUP_ID, SHOW_CURRENT_LOCATION_ID, 3, R.string.show_current_location);
-		menu.add(VIEW_GROUP_ID, ADDRESS_TO_GEOCODE_ID, 3, R.string.address_to_geocode);
-    	return super.onCreateOptionsMenu(menu);
+        menu.add(VIEW_GROUP_ID, ZOOM_UP_ID, 0, R.string.zoom_up);
+        menu.add(VIEW_GROUP_ID, ZOOM_DOWN_ID, 1, R.string.zoom_down);
+        menu.add(VIEW_GROUP_ID, MOVE_TO_CURRENT_LOCATION_ID, 2,
+                R.string.move_to_current_location);
+        menu.add(VIEW_GROUP_ID, SHOW_CURRENT_LOCATION_ID, 3,
+                R.string.show_current_location);
+        menu.add(VIEW_GROUP_ID, ADDRESS_TO_GEOCODE_ID, 3,
+                R.string.address_to_geocode);
+        return super.onCreateOptionsMenu(menu);
     }
- 
+
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
-    	super.onMenuItemSelected(featureId, item);
-		switch (item.getItemId()) {
-	
-		case ZOOM_UP_ID:
-			zoomIn();
-			break;
-		case ZOOM_DOWN_ID:
-			zoomOut();
-			break;
-		case SHOW_CURRENT_LOCATION_ID:
-			showCurrentLocation();
-			break;
-		case MOVE_TO_CURRENT_LOCATION_ID:
-			moveToCurrentLocation();
-			break;
-		case ADDRESS_TO_GEOCODE_ID:
-			addressToGeocode();
-			break;
-		}
-    	return true;
+        super.onMenuItemSelected(featureId, item);
+        switch (item.getItemId()) {
+
+        case ZOOM_UP_ID:
+            zoomIn();
+            break;
+        case ZOOM_DOWN_ID:
+            zoomOut();
+            break;
+        case SHOW_CURRENT_LOCATION_ID:
+            showCurrentLocation();
+            break;
+        case MOVE_TO_CURRENT_LOCATION_ID:
+            moveToCurrentLocation();
+            break;
+        case ADDRESS_TO_GEOCODE_ID:
+            addressToGeocode();
+            break;
+        }
+        return true;
     }
 
-	private void zoomIn() {
-		mapView.getController().zoomIn();
-	}
+    private void zoomIn() {
+        mapView.getController().zoomIn();
+    }
 
-	private void zoomOut() {
-		mapView.getController().zoomOut();
-	}
-	@Override
+    private void zoomOut() {
+        mapView.getController().zoomOut();
+    }
+
+    @Override
     protected boolean isRouteDisplayed() {
-    	return false;
+        return false;
     }
 
     private void showCurrentLocation() {
-    	Location loc = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-    	if (loc != null) {
-    		textView.setText(
-    				"latitude = " + loc.getLatitude()
-    				+ " longigude = " + loc.getLongitude()
-    		);
-    	} else {
-    		// まだ現在位置が一度も特定されていない場合
-    		textView.setText(
-    				"location is not provided"
-    		);
-    	}
+        Location loc = locationManager
+                .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (loc != null) {
+            textView.setText("latitude = " + loc.getLatitude()
+                    + " longigude = " + loc.getLongitude());
+        } else {
+            // まだ現在位置が一度も特定されていない場合
+            textView.setText("location is not provided");
+        }
     }
 
     private void moveToCurrentLocation() {
-    	Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-    	int latitudeE6 = (int) (location.getLatitude() * 1E6);
-    	int longitudeE6 = (int) (location.getLongitude() * 1E6);
-    	GeoPoint gp = new GeoPoint(
-    			latitudeE6, longitudeE6);
-    	mapView.getController().animateTo(gp);
+        Location location = locationManager
+                .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        int latitudeE6 = (int) (location.getLatitude() * 1E6);
+        int longitudeE6 = (int) (location.getLongitude() * 1E6);
+        GeoPoint gp = new GeoPoint(latitudeE6, longitudeE6);
+        mapView.getController().animateTo(gp);
 
     }
 
     private void addressToGeocode() {
-    	LayoutInflater factory = LayoutInflater.from(this);
-    	View view = factory.inflate(R.layout.geocode, null);
-    	final Button addressToGeocodeButton = (Button) view.findViewById(R.id.AddressToGeocodeButton);
-    	final EditText addressEditText = (EditText) view.findViewById(R.id.AddressEditText);
-    	final EditText longitudeEditText = (EditText) view.findViewById(R.id.LongitudeEditText);
-    	final EditText latitudeEditText = (EditText) view.findViewById(R.id.LatitudeEditText);
+        LayoutInflater factory = LayoutInflater.from(this);
+        View view = factory.inflate(R.layout.geocode, null);
+        final Button addressToGeocodeButton = (Button) view
+                .findViewById(R.id.AddressToGeocodeButton);
+        final EditText addressEditText = (EditText) view
+                .findViewById(R.id.AddressEditText);
+        final EditText longitudeEditText = (EditText) view
+                .findViewById(R.id.LongitudeEditText);
+        final EditText latitudeEditText = (EditText) view
+                .findViewById(R.id.LatitudeEditText);
+        final Spinner addressSpinner = (Spinner) view
+                .findViewById(R.id.AddressSpiner);
 
-    	// 選択せず
-    	longitude = null;
-    	latitude = null;
+        // 選択せず
+        longitude = null;
+        latitude = null;
 
-    	addressToGeocodeButton.setOnClickListener(new View.OnClickListener() {
-    		public void onClick(View v) {
-    			CharSequence text = addressEditText.getText();
-    			Geocoder coder = new Geocoder(getApplicationContext());
-        		// TODO 日本語はどうするか？
-//    			Geocoder coder = new Geocoder(getApplicationContext(), Locale.JAPAN);
-    			List<Address> addresses = null;
-    			try {
-					addresses = coder.getFromLocationName(text.toString(), 1);
-				} catch (IOException e) {
-					Log.e("LocationExampleActivity", "Geocoder call failed", e);
-					e.printStackTrace();
-				}
-				if (addresses.size() > 0) {
-					Address address = addresses.get(0);
-					longitude = new Double(address.getLongitude());
-					latitude = new Double(address.getLatitude());
-					longitudeEditText.setText(String.valueOf(longitude));
-					latitudeEditText.setText(String.valueOf(latitude));
-				}
-    		}
-    	});
-    	AlertDialog dialog = new AlertDialog.Builder(this).setView(view).setPositiveButton(
-				R.string.go_to_there, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						Log.d("LocationExampleActivity", "latitude = " + latitude);
-						Log.d("LocationExampleActivity", "longitude = " + longitude);
-						if (latitude != null && longitude != null) {
-							int latitudeE6 = (int)(latitude * 1E6);
-							int longitudeE6 = (int)(longitude * 1E6);
-							
-							mapView.getController().animateTo(new GeoPoint(latitudeE6, longitudeE6));
-						}
-					}
-				}).setNegativeButton(R.string.cancel,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-					}
-				}).create();
-    	dialog.show();
-    	
-	}
+        addressToGeocodeButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                CharSequence text = addressEditText.getText();
+                Geocoder coder = new Geocoder(getApplicationContext());
+                // TODO 日本語はどうするか？
+                // Geocoder coder = new Geocoder(getApplicationContext(),
+                // Locale.JAPAN);
+                List<Address> addresses = null;
+                try {
+                    addresses = coder.getFromLocationName(text.toString(),
+                            MAX_GEOCODE_RESULT);
+                } catch (IOException e) {
+                    Log.e("LocationExampleActivity", "Geocoder call failed", e);
+                    e.printStackTrace();
+                }
+                if (addresses.size() > 0) {
+                    List<AddressWrapper> wrapperList = new ArrayList<AddressWrapper>();
+                    for (Address address : addresses) {
+                        wrapperList.add(new AddressWrapper(address));
+                    }
+                    ArrayAdapter<AddressWrapper> addressAdapter = new ArrayAdapter<AddressWrapper>(
+                            getApplicationContext(),
+                            android.R.layout.simple_spinner_item, wrapperList);
+                    addressSpinner.setAdapter(addressAdapter);
+                } else {
+                    ArrayAdapter<AddressWrapper> addressAdapter = new ArrayAdapter<AddressWrapper>(
+                            getApplicationContext(),
+                            android.R.layout.simple_spinner_item,
+                            new ArrayList<AddressWrapper>());
+                    addressSpinner.setAdapter(addressAdapter);
+                    longitude = null;
+                    latitude = null;
+                    longitudeEditText.setText(null);
+                    latitudeEditText.setText(null);
+                }
+            }
+        });
+        addressSpinner
+                .setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+                    public void onItemSelected(AdapterView<?> adapterView,
+                            View view, int position, long id) {
+
+                        ArrayAdapter<AddressWrapper> adapter = (ArrayAdapter<AddressWrapper>) adapterView
+                                .getAdapter();
+                        Address address = adapter.getItem(position)
+                                .getAddress();
+                        longitude = new Double(address.getLongitude());
+                        latitude = new Double(address.getLatitude());
+                        longitudeEditText.setText(String.valueOf(longitude));
+                        latitudeEditText.setText(String.valueOf(latitude));
+
+                    }
+
+                    public void onNothingSelected(AdapterView<?> arg0) {
+                        longitude = null;
+                        latitude = null;
+                        longitudeEditText.setText(null);
+                        latitudeEditText.setText(null);
+                    }
+                });
+        AlertDialog dialog = new AlertDialog.Builder(this).setView(view)
+                .setPositiveButton(R.string.go_to_there,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                    int which) {
+                                Log.d("LocationExampleActivity", "latitude = "
+                                        + latitude);
+                                Log.d("LocationExampleActivity", "longitude = "
+                                        + longitude);
+                                if (latitude != null && longitude != null) {
+                                    int latitudeE6 = (int) (latitude * 1E6);
+                                    int longitudeE6 = (int) (longitude * 1E6);
+
+                                    mapView.getController().animateTo(
+                                            new GeoPoint(latitudeE6,
+                                                    longitudeE6));
+                                }
+                            }
+                        }).setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,
+                                    int which) {
+                            }
+                        }).create();
+        dialog.show();
+
+    }
 
     @Override
     protected void onPause() {
-    	// MyLocationOverlayを無効化
-    	myLocationOverlay.disableMyLocation();
-    	myLocationOverlay.disableCompass();
+        // MyLocationOverlayを無効化
+        myLocationOverlay.disableMyLocation();
+        myLocationOverlay.disableCompass();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-    	// MyLocationOverlayを有効化
-    	myLocationOverlay.enableMyLocation();
-    	myLocationOverlay.enableCompass();
+        // MyLocationOverlayを有効化
+        myLocationOverlay.enableMyLocation();
+        myLocationOverlay.enableCompass();
         mapView.invalidate();
         super.onResume();
-   }
+    }
 }

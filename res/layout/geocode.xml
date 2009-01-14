@@ -3,7 +3,7 @@
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/AddressTextView" android:editable="true" android:text="@string/address"></TextView>
-<EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/AddressEditText"></EditText><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/address_to_geocode" android:capitalize="none" android:id="@+id/AddressToGeocodeButton"></Button>
+<EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/AddressEditText"></EditText><Spinner android:layout_height="wrap_content" android:id="@+id/AddressSpiner" android:layout_width="fill_parent"></Spinner><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/address_to_geocode" android:capitalize="none" android:id="@+id/AddressToGeocodeButton"></Button>
 
 
 
@@ -13,6 +13,7 @@
 <EditText android:layout_height="wrap_content" android:editable="false" android:layout_width="fill_parent" android:id="@+id/LongitudeEditText"></EditText>
 <TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/latitude"></TextView>
 <EditText android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/LatitudeEditText" android:editable="false"></EditText>
+
 
 
 </LinearLayout>
