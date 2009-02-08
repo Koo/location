@@ -2,8 +2,6 @@
 <resources>
     <string name="hello">Hello World, LocationExampleActivity</string>
     <string name="app_name">LocationExample</string>
-    <string name="zoom_up">Zoom in</string>
-    <string name="zoom_down">Zoom out</string>
     <string name="move_to_current_location">Move to current location</string>
     <string name="show_current_location">Show current location</string>
     <string name="geocode_to_address">Geocode to address</string>

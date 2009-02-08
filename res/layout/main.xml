@@ -4,13 +4,20 @@
 	android:layout_height="fill_parent">
 	<TextView android:id="@+id/PosisionView" android:layout_width="wrap_content" 
 	android:layout_height="wrap_content"></TextView>
-	<com.google.android.maps.MapView 
-		android:id="@+id/Map"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" 
-		android:text="@string/hello"
-		android:enabled="true"
-		android:clickable="true"
-		android:apiKey="0DclZOOK3MUwPWHzrcpVl_JesnkRADaTdYFbHMQ" />
+	<RelativeLayout 
+	  android:layout_width="fill_parent" 
+	  android:layout_height="fill_parent">
+		<com.google.android.maps.MapView 
+			android:id="@+id/Map" 
+			android:layout_width="fill_parent" 
+			android:layout_height="fill_parent" 
+			android:clickable="true" 
+			android:apiKey="0DclZOOK3MUwPWHzrcpVl_JesnkRADaTdYFbHMQ" />
+		<LinearLayout android:id="@+id/zoom" 
+			android:layout_height="wrap_content" 
+			android:layout_width="fill_parent"
+			android:layout_alignParentBottom="true"
+			android:layout_centerVertical="true"/>
+	</RelativeLayout>
 
 </LinearLayout>

@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -40,11 +41,9 @@ public class LocationExampleActivity extends MapActivity {
     private Double latitude;
 
     private static final int VIEW_GROUP_ID = 1;
-    private static final int ZOOM_UP_ID = 2;
-    private static final int ZOOM_DOWN_ID = 3;
-    private static final int MOVE_TO_CURRENT_LOCATION_ID = 4;
-    private static final int SHOW_CURRENT_LOCATION_ID = 5;
-    private static final int ADDRESS_TO_GEOCODE_ID = 6;
+    private static final int MOVE_TO_CURRENT_LOCATION_ID = 2;
+    private static final int SHOW_CURRENT_LOCATION_ID = 3;
+    private static final int ADDRESS_TO_GEOCODE_ID = 4;
 
     /** GEOCODEの最大結果件数 */
     protected static final int MAX_GEOCODE_RESULT = 10;
@@ -108,18 +107,21 @@ public class LocationExampleActivity extends MapActivity {
         });
 
         mapView.getOverlays().add(myLocationOverlay);
-        mapView.setClickable(true);
+
+		ViewGroup zoom = (ViewGroup) findViewById(R.id.zoom);
+		zoom.addView(mapView.getZoomControls());
+		mapView.displayZoomControls(true);
+
+		mapView.setClickable(true);
         mapView.setEnabled(true);
         mapView.invalidate();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(VIEW_GROUP_ID, ZOOM_UP_ID, 0, R.string.zoom_up);
-        menu.add(VIEW_GROUP_ID, ZOOM_DOWN_ID, 1, R.string.zoom_down);
-        menu.add(VIEW_GROUP_ID, MOVE_TO_CURRENT_LOCATION_ID, 2,
+        menu.add(VIEW_GROUP_ID, MOVE_TO_CURRENT_LOCATION_ID, 1,
                 R.string.move_to_current_location);
-        menu.add(VIEW_GROUP_ID, SHOW_CURRENT_LOCATION_ID, 3,
+        menu.add(VIEW_GROUP_ID, SHOW_CURRENT_LOCATION_ID, 2,
                 R.string.show_current_location);
         menu.add(VIEW_GROUP_ID, ADDRESS_TO_GEOCODE_ID, 3,
                 R.string.address_to_geocode);
@@ -131,12 +133,6 @@ public class LocationExampleActivity extends MapActivity {
         super.onMenuItemSelected(featureId, item);
         switch (item.getItemId()) {
 
-        case ZOOM_UP_ID:
-            zoomIn();
-            break;
-        case ZOOM_DOWN_ID:
-            zoomOut();
-            break;
         case SHOW_CURRENT_LOCATION_ID:
             showCurrentLocation();
             break;
@@ -148,14 +144,6 @@ public class LocationExampleActivity extends MapActivity {
             break;
         }
         return true;
-    }
-
-    private void zoomIn() {
-        mapView.getController().zoomIn();
-    }
-
-    private void zoomOut() {
-        mapView.getController().zoomOut();
     }
 
     @Override
