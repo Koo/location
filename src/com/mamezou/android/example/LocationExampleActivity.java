@@ -34,7 +34,6 @@ import com.google.android.maps.MyLocationOverlay;
 public class LocationExampleActivity extends MapActivity {
     private MapView mapView;
     private TextView textView;
-    private LocationManager locationManager;
     private MyLocationOverlay myLocationOverlay;
 
     private Double longitude;
@@ -56,43 +55,36 @@ public class LocationExampleActivity extends MapActivity {
         mapView = (MapView) findViewById(R.id.Map);
         textView = (TextView) findViewById(R.id.PosisionView);
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        List<String> allProviders = locationManager.getAllProviders();
-        for (int i = 0; i < allProviders.size(); i++) {
-            Log.d("LocationExampleActivity", "provider [" + i + "] is "
-                    + allProviders.get(i));
-        }
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
-                0, new LocationListener() {
-
-                    public void onLocationChanged(Location location) {
-                        Log.d("LocationExampleActivity", "location changed to "
-                                + location.getLongitude() + " "
-                                + location.getLatitude());
-                    }
-
-                    public void onProviderDisabled(String provider) {
-                        Log.d("LocationExampleActivity", "provider changed to "
-                                + provider);
-                    }
-
-                    public void onProviderEnabled(String provider) {
-                        Log.d("LocationExampleActivity", "provider " + provider
-                                + " enabled");
-                    }
-
-                    public void onStatusChanged(String provider, int status,
-                            Bundle extras) {
-                        Log.d("LocationExampleActivity", "provider " + provider
-                                + "'s status is changed to " + status);
-
-                    }
-
-                });
 
         myLocationOverlay = new MyLocationOverlay(getApplicationContext(),
                 mapView);
+
+        locationListener = new LocationListener() {
+
+            public void onLocationChanged(Location location) {
+                Log.d("LocationExampleActivity", "location changed to "
+                        + location.getLongitude() + " "
+                        + location.getLatitude());
+            }
+
+            public void onProviderDisabled(String provider) {
+                Log.d("LocationExampleActivity", "provider changed to "
+                        + provider);
+            }
+
+            public void onProviderEnabled(String provider) {
+                Log.d("LocationExampleActivity", "provider " + provider
+                        + " enabled");
+            }
+
+            public void onStatusChanged(String provider, int status,
+                    Bundle extras) {
+                Log.d("LocationExampleActivity", "provider " + provider
+                        + "'s status is changed to " + status);
+
+            }
+
+        };
 
         myLocationOverlay.enableMyLocation();
         myLocationOverlay.onProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -166,11 +158,12 @@ public class LocationExampleActivity extends MapActivity {
     private void moveToCurrentLocation() {
         Location location = locationManager
                 .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        int latitudeE6 = (int) (location.getLatitude() * 1E6);
-        int longitudeE6 = (int) (location.getLongitude() * 1E6);
-        GeoPoint gp = new GeoPoint(latitudeE6, longitudeE6);
-        mapView.getController().animateTo(gp);
-
+        if (location != null) {
+	        int latitudeE6 = (int) (location.getLatitude() * 1E6);
+	        int longitudeE6 = (int) (location.getLongitude() * 1E6);
+	        GeoPoint gp = new GeoPoint(latitudeE6, longitudeE6);
+	        mapView.getController().animateTo(gp);
+        }
     }
 
     private void addressToGeocode() {
@@ -279,20 +272,37 @@ public class LocationExampleActivity extends MapActivity {
 
     }
 
-    @Override
-    protected void onPause() {
-        // MyLocationOverlayを無効化
-        myLocationOverlay.disableMyLocation();
-        myLocationOverlay.disableCompass();
-        super.onPause();
-    }
+    private LocationListener locationListener;
+    private LocationManager locationManager;
 
     @Override
     protected void onResume() {
+        // アクティビティが全面に復帰した際はロケーションリスナを復帰
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        List<String> allProviders = locationManager.getAllProviders();
+        for (int i = 0; i < allProviders.size(); i++) {
+            Log.d("LocationExampleActivity", "provider [" + i + "] is "
+                    + allProviders.get(i));
+        }
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+                0, locationListener);
+
         // MyLocationOverlayを有効化
         myLocationOverlay.enableMyLocation();
         myLocationOverlay.enableCompass();
         mapView.invalidate();
         super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+    	// アクティビティが全面にない間は、省電力化のためにロケーションリスナを停止
+    	locationManager.removeUpdates(locationListener);
+    	locationManager = null;
+        // MyLocationOverlayを無効化
+        myLocationOverlay.disableMyLocation();
+        myLocationOverlay.disableCompass();
+        super.onPause();
     }
 }
