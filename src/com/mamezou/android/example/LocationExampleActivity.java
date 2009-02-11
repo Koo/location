@@ -277,7 +277,7 @@ public class LocationExampleActivity extends MapActivity {
 
     @Override
     protected void onResume() {
-        // アクティビティが全面に復帰した際はLocationListenerを復帰
+        // アクティビティが全面に復帰した際はLocationListenerを登録
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         List<String> allProviders = locationManager.getAllProviders();
         for (int i = 0; i < allProviders.size(); i++) {
@@ -297,7 +297,7 @@ public class LocationExampleActivity extends MapActivity {
 
     @Override
     protected void onPause() {
-    	// アクティビティが全面にない間は、省電力化のためにLocationListenerを停止
+    	// アクティビティが全面にない間は、省電力化のためにLocationListenerを解除
     	locationManager.removeUpdates(locationListener);
     	locationManager = null;
         // MyLocationOverlayを無効化
