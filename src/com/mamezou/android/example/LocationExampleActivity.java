@@ -56,9 +56,6 @@ public class LocationExampleActivity extends MapActivity {
         textView = (TextView) findViewById(R.id.PosisionView);
 
 
-        myLocationOverlay = new MyLocationOverlay(getApplicationContext(),
-                mapView);
-
         locationListener = new LocationListener() {
 
             public void onLocationChanged(Location location) {
@@ -86,6 +83,8 @@ public class LocationExampleActivity extends MapActivity {
 
         };
 
+        myLocationOverlay = new MyLocationOverlay(getApplicationContext(),
+                mapView);
         myLocationOverlay.enableMyLocation();
         myLocationOverlay.onProviderEnabled(LocationManager.GPS_PROVIDER);
         myLocationOverlay.enableCompass();
