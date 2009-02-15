@@ -198,6 +198,11 @@ public class LocationExampleActivity extends MapActivity {
                     Log.e("LocationExampleActivity", "Geocoder call failed", e);
                     e.printStackTrace();
                 }
+                for (Address address : addresses) {
+                	Log.d("LocationExampleActivity", 
+                			"latitude = " + address.getLatitude() 
+                			+ " longitude = " + address.getLongitude());
+                }
                 if (addresses.size() > 0) {
                     List<AddressWrapper> wrapperList = new ArrayList<AddressWrapper>();
                     for (Address address : addresses) {
