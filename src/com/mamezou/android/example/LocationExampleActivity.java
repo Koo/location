@@ -185,18 +185,18 @@ public class LocationExampleActivity extends MapActivity {
 
         addressToGeocodeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                CharSequence text = addressEditText.getText();
+                CharSequence addressText = addressEditText.getText();
                 Geocoder coder = new Geocoder(getApplicationContext());
                 // TODO 日本語はどうするか？
                 // Geocoder coder = new Geocoder(getApplicationContext(),
                 // Locale.JAPAN);
                 List<Address> addresses = null;
                 try {
-                    addresses = coder.getFromLocationName(text.toString(),
+                    addresses = coder.getFromLocationName(addressText.toString(),
                             MAX_GEOCODE_RESULT);
                 } catch (IOException e) {
                     Log.e("LocationExampleActivity", "Geocoder call failed", e);
-                    e.printStackTrace();
+                    return;
                 }
                 for (Address address : addresses) {
                 	Log.d("LocationExampleActivity", 
