@@ -87,7 +87,8 @@ public class LocationExampleActivity extends MapActivity {
                 mapView);
         myLocationOverlay.enableMyLocation();
         myLocationOverlay.onProviderEnabled(LocationManager.GPS_PROVIDER);
-        myLocationOverlay.enableCompass();
+        // Android SDK 1.5のemulatorでは、コンパスが提供されないため、コメント
+//        myLocationOverlay.enableCompass();
         // 一番初めに現在位置が配信された際に実行されるコールバック
         myLocationOverlay.runOnFirstFix(new Runnable() {
             public void run() {
@@ -294,7 +295,8 @@ public class LocationExampleActivity extends MapActivity {
 
         // MyLocationOverlayを有効化
         myLocationOverlay.enableMyLocation();
-        myLocationOverlay.enableCompass();
+        // Android SDK 1.5のemulatorでは、コンパスが提供されないため、コメント
+//        myLocationOverlay.enableCompass();
         mapView.invalidate();
         super.onResume();
     }
