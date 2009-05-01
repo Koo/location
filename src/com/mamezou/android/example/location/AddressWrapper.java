@@ -1,4 +1,4 @@
-package com.mamezou.android.example;
+package com.mamezou.android.example.location;
 
 import android.location.Address;
 

@@ -1,8 +1,9 @@
-package com.mamezou.android.example;
+package com.mamezou.android.example.location;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -18,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -100,9 +100,7 @@ public class LocationExampleActivity extends MapActivity {
 
         mapView.getOverlays().add(myLocationOverlay);
 
-		ViewGroup zoom = (ViewGroup) findViewById(R.id.zoom);
-		zoom.addView(mapView.getZoomControls());
-		mapView.displayZoomControls(true);
+        mapView.setBuiltInZoomControls(true);
 
 		mapView.setClickable(true);
         mapView.setEnabled(true);
@@ -187,10 +185,8 @@ public class LocationExampleActivity extends MapActivity {
         addressToGeocodeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 CharSequence addressText = addressEditText.getText();
-                Geocoder coder = new Geocoder(getApplicationContext());
-                // TODO 日本語はどうするか？
-                // Geocoder coder = new Geocoder(getApplicationContext(),
-                // Locale.JAPAN);
+                Geocoder coder = new Geocoder(getApplicationContext(),
+						Locale.JAPAN);
                 List<Address> addresses = null;
                 try {
                     addresses = coder.getFromLocationName(addressText.toString(),
@@ -203,6 +199,8 @@ public class LocationExampleActivity extends MapActivity {
                 	Log.d("LocationExampleActivity", 
                 			"latitude = " + address.getLatitude() 
                 			+ " longitude = " + address.getLongitude());
+                	Log.d("LocationExampleActivity",
+                			"featureName = " + address.getFeatureName());
                 }
                 if (addresses.size() > 0) {
                     List<AddressWrapper> wrapperList = new ArrayList<AddressWrapper>();
